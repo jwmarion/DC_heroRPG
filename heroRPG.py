@@ -15,7 +15,7 @@ class character(object):
 
     def attack(self, character):
         character.health -= self.power
-        print "%s does %d damage to the %s." % (self.type, self.power, character.type)
+        print "The %s does %d damage to the %s." % (self.type, self.power, character.type)
         if self.type != "Zombie":
             if character.health <= 0:
                 print "The %s is dead" % character.type
