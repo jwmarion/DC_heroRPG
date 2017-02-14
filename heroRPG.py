@@ -21,7 +21,7 @@ class character(object):
                 print "The %s is dead" % character.type
         else:
             print "ZOMBIE IS IMMORTAL"
-            self.health += 100
+            self.health += character.power
             if character.health <= 0:
                 print "The %s is dead" % character.type
 
@@ -50,7 +50,6 @@ def main():
 
 
     while z.health > 0 and h.health > 0:
-
 
         print
         print "What do you want to do?"
