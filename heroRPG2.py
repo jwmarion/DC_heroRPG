@@ -30,10 +30,17 @@ class Character(object):
         # time.sleep(1.5)
 
     def receive_damage(self, points):
-        self.health -= (points - self.armor)
-        print "%s received %d damage." % (self.name, points)
-        if self.health <= 0:
-            print "%s is dead." % self.name
+        print self.evade
+        if random.random() < float(self.evade) / (float(20) + float(self.evade)):
+            if self.armor <= points:
+                self.health -= (points - self.armor)
+            else:
+                points = 0
+            print "%s received %d damage." % (self.name, points)
+            if self.health <= 0:
+                print "%s is dead." % self.name
+        else:
+            print "Miss!"
 
     def print_status(self):
         print "%s has %d health and %d power." % (self.name, self.health, self.power)
@@ -74,18 +81,17 @@ class Medic(Hero):
 
     def receive_damage(self, points):
         super(Medic, self).receive_damage(points)
-        if random.randrange(1,5) == 1:
-            self.health += 2
-            print "%s healed 2 damage" % (self.name)
+        self.health += 2
+        print "%s healed 2 damage" % (self.name)
 
 
 class Shadow(Hero):
     def __init__(self):
         self.name = 'shadow'
         self.health = 1
-        self.power = 5
+        self.power = 2
         self.coins = 10
-        self.evade = 7
+        self.evade = 80
         self.armor = 0
         self.inventory = []
 
@@ -137,7 +143,7 @@ class Goblin(Character):
         self.power = 2
         self.coins = 5
         self.armor = 1
-
+        self.evade = 1
 
 class Zombie(Character):
     def __init__(self):
@@ -146,7 +152,7 @@ class Zombie(Character):
         self.power = 2
         self.coins = 10
         self.armor = 10
-
+        self.evade = 1
 
 
 class Wizard(Character):
@@ -156,6 +162,7 @@ class Wizard(Character):
         self.power = 1
         self.coins = 6
         self.armor = 0
+        self.evade = 1
 
     def attack(self, enemy):
         swap_power = random.random() > 0.5
