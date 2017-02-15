@@ -30,8 +30,7 @@ class Character(object):
         # time.sleep(1.5)
 
     def receive_damage(self, points):
-        print self.evade
-        if random.random() < float(self.evade) / (float(20) + float(self.evade)):
+        if random.random() > float(self.evade) / (float(20) + float(self.evade)):
             if self.armor <= points:
                 self.health -= (points - self.armor)
             else:
