@@ -14,6 +14,7 @@ class Character(object):
         self.coins = 20
         self.evade = 1
         self.armor = 0
+        self.inventory = []
 
     def alive(self):
         return self.health > 0
@@ -22,11 +23,11 @@ class Character(object):
         if not self.alive():
             return
         print "%s attacks %s" % (self.name, enemy.name)
-            if random.randrange(1,5) == 1:
-                enemy.receive_damage(self.power * 2)
-            else:
-                enemy.receive_damage(self.power)
-        time.sleep(1.5)
+        if random.randrange(1,5) == 1:
+            enemy.receive_damage(self.power * 2)
+        else:
+            enemy.receive_damage(self.power)
+        # time.sleep(1.5)
 
     def receive_damage(self, points):
         self.health -= (points - self.armor)
@@ -37,8 +38,6 @@ class Character(object):
     def print_status(self):
         print "%s has %d health and %d power." % (self.name, self.health, self.power)
 
-    def special(self):
-        return None
 
 class Hero(Character):
     def __init__(self):
@@ -48,16 +47,20 @@ class Hero(Character):
         self.coins = 20
         self.evade = 1
         self.armor = 2
+        self.inventory = []
 
     def restore(self):
         self.health = 10
         print "Hero's heath is restored to %d!" % self.health
-        time.sleep(1)
+        # time.sleep(1)
 
     def buy(self, item):
         self.coins -= item.cost
-        item.apply(hero)
+        self.inventory.append(item)
+        # item.apply(hero)
 
+    def useItem(self,item):
+        item.apply(hero)
 
 class Medic(Hero):
     def __init__(self):
@@ -98,9 +101,10 @@ class Pacifist(Hero):
         if not self.alive():
             return
         print "%s tells %s that there is a better way!" % (self.name, enemy.name)
-            if random.randrange(1,20) == 1:
-                enemy.health = 0
-        time.sleep(1.5)
+        if random.randrange(1,20) == 1:
+            enemy.health = 0
+            print "The %s ran away to work on himself." % (enemy.name)
+        # time.sleep(1.5)
 
 class James(Hero):
     def __init__(self):
@@ -116,11 +120,11 @@ class James(Hero):
                 return
             for x in (random.randrange(1,4)):
                 print "%s attacks %s" % (self.name, enemy.name)
-                    if random.randrange(1,5) == 1:
-                        enemy.receive_damage(self.power * 2)
-                    else:
-                        enemy.receive_damage(self.power)
-            time.sleep(1.5)
+                if random.randrange(1,5) == 1:
+                    enemy.receive_damage(self.power * 2)
+                else:
+                    enemy.receive_damage(self.power)
+            # time.sleep(1.5)
 
 class Goblin(Character):
     def __init__(self):
@@ -164,12 +168,13 @@ class Battle(object):
         while hero.alive() and enemy.alive():
             hero.print_status()
             enemy.print_status()
-            time.sleep(1.5)
+            # time.sleep(1.5)
             print "-----------------------"
             print "What do you want to do?"
             print "1. fight %s" % enemy.name
             print "2. do nothing"
             print "3. flee"
+            print "4. use item"
             print "> ",
             input = int(raw_input())
             if input == 1:
@@ -179,6 +184,15 @@ class Battle(object):
             elif input == 3:
                 print "Goodbye."
                 exit(0)
+            elif input == 4:
+                for x in range(0,len(hero.inventory)):
+                    print "(%d) %s" % (x, hero.inventory[x].name)
+                    c =int(raw_input("Which item?> "))
+                    if (c < len(hero.inventory)):
+                        hero.useItem(hero.inventory[c])
+                    else:
+                        print "nope"
+
             else:
                 print "Invalid input %r" % input
                 continue
@@ -186,7 +200,7 @@ class Battle(object):
         if hero.alive():
             print "You defeated the %s" % enemy.name
             print "You gained %d coins!" % enemy.coins
-                hero.coins += enemy.coins
+            hero.coins += enemy.coins
             return True
         else:
             print "YOU LOSE!"
@@ -195,6 +209,7 @@ class Battle(object):
 class Tonic(object):
     cost = 5
     name = 'tonic'
+    type = 'any'
     def apply(self, character):
         character.health += 2
         print "%s's health increased to %d." % (character.name, character.health)
@@ -202,6 +217,7 @@ class Tonic(object):
 class Sword(object):
     cost = 10
     name = 'sword'
+    type = 'any'
     def apply(self, hero):
         hero.power += 2
         print "%s's power increased to %d." % (hero.name, hero.power)
@@ -209,6 +225,7 @@ class Sword(object):
 class SuperTonic(object):
     cost = 10
     name = "Super Tonic!"
+    type = 'any'
     def apply(self, character):
         character.health += 2
         print "%s's health increased to %d" % (character.name, character.health)
@@ -216,31 +233,37 @@ class SuperTonic(object):
 class EvadePotion(object):
     cost = 12
     name = "Dodgy potion"
+    type = 'any'
     def apply(self, character):
-        character.dodge += 2
-        print "%s's dodge stat increased to %d" % (character.name, character.health)
+        character.evade += 2
+        print "%s's evade stat increased to %d" % (character.name, character.evade)
 
 class ArmorPotion(object):
     cost = 8
     name = "Armor potion"
+    type = 'any'
     def apply(self, character):
         character.armor += 2
         print "%s's armor stat increased to %d" % (character.name, character.armor)
 
-# class AcidicSlime(object):
-#     cost = 3
-#     name = "Acidic Slime!"
-#
-#
-#
-#
+class AcidicSlime(object):
+    cost = 3
+    type = 'battle'
+    name = "Acidic Slime!"
+    def apply(self, enemy):
+        enemy.armor = 0
+        print "%s's armor stat is now 0!"
+
+
+
+
 
 
 class Store(object):
     # If you define a variable in the scope of a class:
     # This is a class variable and you can access it like
     # Store.items => [Tonic, Sword]
-    items = [Tonic, Sword, SuperTonic]
+    items = [Tonic, Sword, SuperTonic, EvadePotion, ArmorPotion]
     def do_shopping(self, hero):
         while True:
             print "====================="
@@ -258,7 +281,13 @@ class Store(object):
             else:
                 ItemToBuy = Store.items[input - 1]
                 item = ItemToBuy()
-                hero.buy(item)
+                if item.cost <= hero.coins:
+                    hero.buy(item)
+                    t = raw_input("Use item now? (y/n)")
+                    if t == 'y' and (item.type != 'battle'):
+                        item.apply(hero)
+                else:
+                    print "Item costs too much!"
 
 hero = Hero()
 enemies = [Goblin(), Wizard()]
