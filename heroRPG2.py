@@ -29,7 +29,7 @@ class Character(object):
         time.sleep(1.5)
 
     def receive_damage(self, points):
-        self.health -= points
+        self.health -= (points - self.armor)
         print "%s received %d damage." % (self.name, points)
         if self.health <= 0:
             print "%s is dead." % self.name
