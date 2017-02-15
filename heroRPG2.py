@@ -70,6 +70,7 @@ class Medic(Hero):
         self.coins = 25
         self.evade = 2
         self.armor = 1
+        self.inventory = []
 
     def receive_damage(self, points):
         super(Medic, self).receive_damage(points)
@@ -86,6 +87,7 @@ class Shadow(Hero):
         self.coins = 10
         self.evade = 7
         self.armor = 0
+        self.inventory = []
 
 
 class Pacifist(Hero):
@@ -96,6 +98,7 @@ class Pacifist(Hero):
         self.coins = 5
         self.evade = 3
         self.armor = 2
+        self.inventory = []
 
     def attack(self, enemy):
         if not self.alive():
@@ -114,6 +117,7 @@ class James(Hero):
         self.coins = 8
         self.evade = 1
         self.armor = 0
+        self.inventory = []
 
         def attack(self, enemy):
             if not self.alive():
@@ -134,13 +138,15 @@ class Goblin(Character):
         self.coins = 5
         self.armor = 1
 
+
 class Zombie(Character):
     def __init__(self):
         self.name = 'zombie'
-        self.health = '100'
+        self.health = 10
         self.power = 2
         self.coins = 10
         self.armor = 10
+
 
 
 class Wizard(Character):
@@ -227,7 +233,7 @@ class SuperTonic(object):
     name = "Super Tonic!"
     type = 'any'
     def apply(self, character):
-        character.health += 2
+        character.health += 10
         print "%s's health increased to %d" % (character.name, character.health)
 
 class EvadePotion(object):
@@ -250,10 +256,19 @@ class AcidicSlime(object):
     cost = 3
     type = 'battle'
     name = "Acidic Slime!"
-    def apply(self, enemy):
+    def apply(self, character):
         enemy.armor = 0
-        print "%s's armor stat is now 0!"
+        print "%s's armor stat is now %d!" % (enemy.name, enemy.armor)
 
+class SwapPotion(object):
+    cost = 3
+    type = 'battle'
+    name = "Swap Potion"
+    def apply(self, character):
+        print "%s swaps power with %s during attack" % (character.name, enemy.name)
+        character.power, enemy.power = enemy.power, character.power
+        character.attack(enemy)
+        character.power, enemy.power = enemy.power, character.power
 
 
 
@@ -263,7 +278,7 @@ class Store(object):
     # If you define a variable in the scope of a class:
     # This is a class variable and you can access it like
     # Store.items => [Tonic, Sword]
-    items = [Tonic, Sword, SuperTonic, EvadePotion, ArmorPotion]
+    items = [Tonic, Sword, SuperTonic, EvadePotion, ArmorPotion, AcidicSlime, SwapPotion]
     def do_shopping(self, hero):
         while True:
             print "====================="
@@ -289,10 +304,35 @@ class Store(object):
                 else:
                     print "Item costs too much!"
 
-hero = Hero()
-enemies = [Goblin(), Wizard()]
+
+enemies = [Goblin(), Wizard(), Zombie(), ]
 battle_engine = Battle()
 shopping_engine = Store()
+
+print "What class would you like to use?"
+print "(1) Hero\n(2) Medic\n(3) Shadow\n(4) Pacifist\n(5) James"
+inp = int(raw_input("> "))
+
+if inp == 1:
+    hero = Hero()
+    print "hero"
+elif inp == 2:
+    hero = Medic()
+    print "Medic"
+elif inp == 3:
+    hero = Shadow()
+    print "Shadow"
+elif inp == 4:
+    hero = Pacifist()
+    print "Pacifist"
+elif inp == 5:
+    hero = James()
+    print "James"
+else:
+    print "Fail"
+
+
+
 
 for enemy in enemies:
     hero_won = battle_engine.do_battle(hero, enemy)
